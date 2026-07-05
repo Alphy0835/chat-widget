@@ -14,6 +14,7 @@
 - `product/`
 - расширенные security-файлы: `abuse-and-fraud.md`, `access-review.md`, `audit-logging.md`, `compliance-controls.md`, `data-retention.md`, `incident-response.md`, `privacy-and-compliance.md`, `risk-register.md`, `vulnerability-management.md`
 - расширенные operations-файлы: `disaster-recovery.md`, `incident-levels.md`, `incident-notification.md`, `postmortem-template.md`, `service-levels.md`
+- расширенные quality-файлы: `quality/accessibility-checklist.md`, `quality/severity-matrix.md`
 
 ## Заменённые механизмами команды (не активируются, справочно)
 
