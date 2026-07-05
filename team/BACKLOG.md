@@ -4,7 +4,7 @@
 
 | Задача | Название | Роль | Статус | Ветка |
 |---|---|---|---|---|
-| TASK-002 | Полная миграция остатка docs-шаблона в docs-archive/ | docs | TODO | task/TASK-002 |
+| TASK-002 | Полная миграция остатка docs-шаблона в docs-archive/ | docs | REVIEW | task/TASK-002 |
 
 <!-- Пример:
 | TASK-001 | Каркас API и БД | backend | TODO | task/TASK-001 |

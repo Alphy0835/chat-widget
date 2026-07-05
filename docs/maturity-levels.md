@@ -58,4 +58,4 @@ Update trigger: изменение состава обязательных до�
 - расширенные security-файлы: `audit-logging.md`, `risk-register.md`, `privacy-and-compliance.md`, `vulnerability-management.md`, `data-retention.md`, `abuse-and-fraud.md`, `access-review.md`, `compliance-controls.md`
 - расширенные operations-файлы: `service-levels.md`, `incident-levels.md`, `incident-response.md`, `incident-notification.md`, `postmortem-template.md`, `disaster-recovery.md`
 
-Исходники этих файлов можно взять из `G:\Мой диск\docs шаблон`.
+Исходники этих файлов можно взять из `docs-archive/`.
