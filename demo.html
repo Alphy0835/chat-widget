@@ -5,69 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Demo — сайт клиента</title>
 <style>
-  /* Стили сайта-хоста, намеренно конфликтующие с виджетом,
-     чтобы проверить изоляцию через Shadow DOM. */
-  * {
-    box-sizing: content-box !important;
-  }
-
   body {
     margin: 0;
-    font-family: Georgia, serif;
-    background: #111827;
-    color: #e5e7eb;
-    line-height: 1.6;
-  }
-
-  button {
-    all: unset;
-    color: red;
-    cursor: pointer;
-  }
-
-  input {
-    all: unset;
-    border: 3px dashed lime !important;
-  }
-
-  section {
-    max-width: 720px;
-    margin: 40px auto;
-    padding: 0 20px;
-  }
-
-  h1 {
-    color: #f59e0b;
-    font-size: 32px;
-  }
-
-  .card {
-    background: #1f2937;
-    border: 2px solid #f59e0b;
-    border-radius: 4px;
-    padding: 20px;
-    margin-bottom: 16px;
+    background: #ffffff;
   }
 </style>
 </head>
 <body>
-<section>
-  <h1>Сайт клиента (демо)</h1>
-  <div class="card">
-    <p>
-      Эта страница имитирует произвольный сайт с собственной, намеренно
-      «кривой» вёрсткой и глобальными стилями (<code>button { all: unset; color: red; }</code>,
-      <code>* { box-sizing: content-box !important; }</code> и т.д.), чтобы проверить,
-      что виджет ниже отрисовывается корректно независимо от стилей хоста,
-      а стили виджета, в свою очередь, не просачиваются на страницу.
-    </p>
-  </div>
-  <div class="card">
-    <p>Обычная кнопка страницы (проверка, что стили виджета сюда не протекли):</p>
-    <button type="button">Кнопка сайта</button>
-    <input type="text" placeholder="Поле сайта" />
-  </div>
-</section>
 
 <!-- Данные линейного диалога (D-008) — подключаются до виджета -->
 <script src="widget/data/qa-data.js"></script>
