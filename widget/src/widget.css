@@ -11,11 +11,11 @@
 .cw-root,
 .cw-root * {
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: "Roboto Condensed", "Arial Narrow", Arial, sans-serif;
 }
 
 .cw-root {
-  --cw-primary: #2563eb;
+  --cw-primary: #ff4800;
   --cw-radius: 16px;
   --cw-offset: 24px;
 }
@@ -44,6 +44,11 @@
 .cw-button:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  filter: brightness(90%);
+}
+
+.cw-button:active {
+  filter: brightness(85%);
 }
 
 .cw-button svg {
@@ -211,6 +216,14 @@
   justify-content: center;
   flex-shrink: 0;
   padding: 0;
+}
+
+.cw-send-btn:hover {
+  filter: brightness(90%);
+}
+
+.cw-send-btn:active {
+  filter: brightness(85%);
 }
 
 .cw-send-btn:disabled,
