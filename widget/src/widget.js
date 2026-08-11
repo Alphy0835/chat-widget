@@ -228,19 +228,30 @@
       }
       fuseIndex = new window.Fuse(qaData.questions, {
         keys: [
-          { name: "question", weight: 0.7 },
-          { name: "keywords", weight: 0.3 },
+          { name: "question", weight: 0.5 },
+          { name: "keywords", weight: 0.5 },
         ],
-        threshold: 0.4,
+        threshold: 0.3,
         ignoreLocation: true,
-        minMatchCharLength: 2,
+        minMatchCharLength: 3,
+        useExtendedSearch: true,
       });
       return fuseIndex;
     }
 
+    function normalizeSearchQuery(text) {
+      var words = text
+        .replace(/[^\p{L}\p{N}\s]/gu, " ")
+        .split(/\s+/)
+        .filter(function (word) {
+          return word.length >= 3;
+        });
+      return words.length ? words.join(" ") : text;
+    }
+
     function showSearchResults(queryText) {
       var fuse = getFuse();
-      var results = fuse ? fuse.search(queryText).slice(0, 4) : [];
+      var results = fuse ? fuse.search(normalizeSearchQuery(queryText)).slice(0, 4) : [];
 
       if (results.length === 0) {
         appendBotMessage("Точный вопрос не найден. Попробуйте выбрать вопрос из категорий.");
