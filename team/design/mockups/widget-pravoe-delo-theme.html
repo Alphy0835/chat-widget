@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Прототип — тема виджета «pravoe-delo.su» (TASK-004)</title>
+<style>
+  /* Стили страницы-каталога прототипа (НЕ часть виджета — только для показа состояний рядом) */
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #f3f4f6;
+    color: #111827;
+    padding: 32px 16px 120px;
+  }
+
+  .page-title {
+    max-width: 1040px;
+    margin: 0 auto 8px;
+  }
+
+  .page-title h1 {
+    font-size: 22px;
+    margin: 0 0 6px;
+  }
+
+  .page-title p {
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .board {
+    max-width: 1040px;
+    margin: 32px auto 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  @media (max-width: 860px) {
+    .board { grid-template-columns: 1fr; }
+  }
+
+  .frame {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .frame-label {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .frame-stage {
+    position: relative;
+    height: 340px;
+    background:
+      linear-gradient(135deg, #eef0f4 0%, #e5e7eb 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 24px;
+    overflow: hidden;
+  }
+
+  .frame-stage.stage-panel {
+    align-items: flex-end;
+    justify-content: flex-end;
+    height: 460px;
+  }
+
+  .frame-note {
+    padding: 12px 16px 16px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: #4b5563;
+  }
+
+  .frame-note strong { color: #111827; }
+
+  /* ============================================================= */
+  /* Ниже — стили самого виджета, тема pravoe-delo.su (TASK-004).  */
+  /* 1:1 соответствуют значениям из team/design/design-system.md,  */
+  /* переносятся во frontend как есть (только имена классов адаптировать под widget.css). */
+  /* ============================================================= */
+
+  .cw-demo-root {
+    --cw-primary: #ff4800;
+    --cw-radius: 16px;
+    font-family: "Roboto Condensed", "Arial Narrow", Arial, sans-serif;
+  }
+
+  .cw-demo-root * { box-sizing: border-box; }
+
+  /* Плавающая кнопка */
+
+  .cw-button {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 50%;
+    background: var(--cw-primary);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.24);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    padding: 0;
+  }
+
+  .cw-button svg { width: 28px; height: 28px; }
+
+  .cw-button.is-hover {
+    transform: scale(1.05);
+    filter: brightness(90%);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Панель чата */
+
+  .cw-panel {
+    width: 360px;
+    height: 420px;
+    max-width: calc(100% - 8px);
+    background: #fff;
+    border-radius: var(--cw-radius);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .cw-header {
+    background: var(--cw-primary);
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .cw-header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .cw-header-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .cw-close-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.85;
+    padding: 0;
+  }
+
+  .cw-close-btn:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .cw-close-btn svg { width: 16px; height: 16px; }
+
+  .cw-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .cw-placeholder {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  .cw-input-row {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .cw-input {
+    flex: 1;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background: #f9fafb;
+    color: #9ca3af;
+  }
+
+  .cw-send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--cw-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0;
+    transition: filter 0.15s ease;
+  }
+
+  .cw-send-btn:disabled,
+  .cw-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .cw-send-btn svg { width: 18px; height: 18px; }
+
+  /* Легенда токенов под доской */
+
+  .tokens {
+    max-width: 1040px;
+    margin: 40px auto 0;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+
+  .tokens h2 {
+    font-size: 15px;
+    margin: 0 0 12px;
+  }
+
+  .swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .swatch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #374151;
+  }
+
+  .swatch-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1px solid rgba(0,0,0,0.08);
+    flex-shrink: 0;
+  }
+
+  .font-sample {
+    margin-top: 16px;
+    font-family: "Roboto Condensed", "Arial Narrow", Arial, sans-serif;
+  }
+
+  .font-sample .big {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .font-sample .mid {
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .font-sample .small {
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 4px;
+    color: #4b5563;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>Прототип темы виджета под фирменный стиль pravoe-delo.su — TASK-004</h1>
+  <p>
+    Статичный прототип, не подключён к логике <code>widget.js</code> (переключение состояний ниже —
+    просто разные CSS-классы на одинаковой разметке, для показа «как будет выглядеть»).
+    Полное обоснование цвета/шрифта/размеров — в <code>team/design/design-system.md</code>, этот файл только визуальный референс.
+    Значения 1:1 совпадают с design-system.md.
+  </p>
+</div>
+
+<div class="board">
+
+  <div class="frame">
+    <div class="frame-label">1. Плавающая кнопка — закрыто (default)</div>
+    <div class="frame-stage">
+      <div class="cw-demo-root">
+        <button type="button" class="cw-button" aria-label="Открыть чат">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 4h16v12H7l-3 3V4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="frame-note">
+      <strong>Поведение:</strong> плавает поверх контента сайта, позиция настраивается
+      <code>data-position</code> (bottom-right/bottom-left). Клик — открывает панель чата (состояние 3),
+      иконка меняется на крестик закрытия.
+    </div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-label">2. Плавающая кнопка — hover</div>
+    <div class="frame-stage">
+      <div class="cw-demo-root">
+        <button type="button" class="cw-button is-hover" aria-label="Открыть чат">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 4h16v12H7l-3 3V4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="frame-note">
+      <strong>Поведение:</strong> при наведении курсора — увеличение <code>scale(1.05)</code>,
+      затемнение <code>brightness(90%)</code>, более глубокая тень. Курсор — pointer. Без изменений позиции/формы.
+    </div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-label">3. Открытое окно чата</div>
+    <div class="frame-stage stage-panel">
+      <div class="cw-demo-root">
+        <section class="cw-panel" role="dialog" aria-label="Чат">
+          <header class="cw-header">
+            <div class="cw-header-title">
+              <span class="cw-header-icon">●</span>
+              <span>Чат с поддержкой</span>
+            </div>
+            <button type="button" class="cw-close-btn" aria-label="Закрыть чат">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </header>
+          <div class="cw-messages">
+            <p class="cw-placeholder">Чат скоро заработает. Совсем скоро здесь можно будет пообщаться с нами.</p>
+          </div>
+          <div class="cw-input-row">
+            <input class="cw-input" type="text" placeholder="Введите сообщение…" disabled />
+            <button type="button" class="cw-send-btn" disabled aria-label="Отправить">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M3 11l18-7-7 18-2-8-9-3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+    <div class="frame-note">
+      <strong>Поведение:</strong> открывается по клику на плавающую кнопку (плавно, opacity+translateY, 0.18s) —
+      геометрия перехода без изменений от TASK-003. Закрывается кликом на крестик в шапке или повторным
+      кликом на плавающую кнопку. Поле ввода и кнопка отправки на этом этапе неактивны (заглушка, логики чата ещё нет).
+      На мобильной ширине (≤480px) панель растягивается почти на весь экран — см. design-system.md §4, поведение
+      наследуется от TASK-003 без изменений.
+    </div>
+  </div>
+
+</div>
+
+<div class="tokens">
+  <h2>Ключевые токены темы (подробности и px-значения — team/design/design-system.md)</h2>
+  <div class="swatches">
+    <div class="swatch"><span class="swatch-color" style="background:#FF4800"></span> Акцент --cw-primary: #FF4800</div>
+    <div class="swatch"><span class="swatch-color" style="background:#FFFFFF;border:1px solid #d1d5db"></span> Фон панели: #FFFFFF</div>
+    <div class="swatch"><span class="swatch-color" style="background:#6B7280"></span> Текст-заглушка: #6B7280</div>
+    <div class="swatch"><span class="swatch-color" style="background:#F9FAFB;border:1px solid #d1d5db"></span> Фон поля ввода: #F9FAFB</div>
+    <div class="swatch"><span class="swatch-color" style="background:#E5E7EB;border:1px solid #d1d5db"></span> Рамка поля ввода: #E5E7EB</div>
+  </div>
+  <div class="font-sample">
+    <div class="big">Чат с поддержкой — заголовок (font-weight 700, пример крупнее)</div>
+    <div class="mid">Чат с поддержкой — реальный размер шапки, 15px / вес 600</div>
+    <div class="small">Чат скоро заработает. Совсем скоро здесь можно будет пообщаться с нами. — 14px / вес 400</div>
+  </div>
+</div>
+
+</body>
+</html>
