@@ -268,13 +268,22 @@
 
 .cw-input {
   flex: 1;
+  min-width: 0;
   border: 1px solid #e5e7eb;
   border-radius: 20px;
   padding: 10px 14px;
   font-size: 14px;
   outline: none;
   background: #f9fafb;
+  color: #111827;
+}
+
+.cw-input::placeholder {
   color: #9ca3af;
+}
+
+.cw-input:focus {
+  border-color: var(--cw-primary);
 }
 
 .cw-send-btn {

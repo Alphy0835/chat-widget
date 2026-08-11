@@ -75,8 +75,8 @@
       '<p class="cw-placeholder">Чат скоро заработает. Совсем скоро здесь можно будет пообщаться с нами.</p>' +
       "</div>" +
       '<div class="cw-input-row">' +
-      '<input class="cw-input" type="text" placeholder="Введите сообщение…" disabled />' +
-      '<button type="button" class="cw-send-btn" disabled aria-label="Отправить">' +
+      '<input class="cw-input" type="text" placeholder="Введите вопрос…" />' +
+      '<button type="button" class="cw-send-btn" aria-label="Отправить">' +
       ICON_SEND +
       "</button>" +
       "</div>" +
@@ -88,9 +88,16 @@
     var panel = root.querySelector(".cw-panel");
     var closeBtn = root.querySelector(".cw-close-btn");
     var messagesEl = root.querySelector(".cw-messages");
+    var inputEl = root.querySelector(".cw-input");
+    var sendBtn = root.querySelector(".cw-send-btn");
 
     var qaData = getQaData();
     var dialogStarted = false;
+
+    if (!qaData) {
+      inputEl.disabled = true;
+      sendBtn.disabled = true;
+    }
 
     function setOpen(isOpen) {
       root.classList.toggle("cw-open", isOpen);
@@ -189,20 +196,87 @@
     function showAnswer(question, category) {
       appendUserMessage(question.question);
       appendBotMessage(question.answer);
-      appendButtons([
-        {
+      var followUps = [];
+      if (category) {
+        followUps.push({
           label: "Другие вопросы этой категории",
           onClick: function () {
             showQuestions(category);
           },
+        });
+      }
+      followUps.push({
+        label: "Все категории",
+        onClick: function () {
+          showCategories();
         },
-        {
-          label: "Все категории",
-          onClick: function () {
-            showCategories();
+      });
+      appendButtons(followUps);
+    }
+
+    function getCategoryById(categoryId) {
+      return qaData.categories.filter(function (c) {
+        return c.id === categoryId;
+      })[0];
+    }
+
+    var fuseIndex = null;
+
+    function getFuse() {
+      if (fuseIndex || !qaData || typeof window.Fuse !== "function") {
+        return fuseIndex;
+      }
+      fuseIndex = new window.Fuse(qaData.questions, {
+        keys: [
+          { name: "question", weight: 0.7 },
+          { name: "keywords", weight: 0.3 },
+        ],
+        threshold: 0.4,
+        ignoreLocation: true,
+        minMatchCharLength: 2,
+      });
+      return fuseIndex;
+    }
+
+    function showSearchResults(queryText) {
+      var fuse = getFuse();
+      var results = fuse ? fuse.search(queryText).slice(0, 4) : [];
+
+      if (results.length === 0) {
+        appendBotMessage("Точный вопрос не найден. Попробуйте выбрать вопрос из категорий.");
+        appendButtons([
+          {
+            label: "Все категории",
+            onClick: function () {
+              showCategories();
+            },
           },
-        },
-      ]);
+        ]);
+        return;
+      }
+
+      appendBotMessage("Возможно, вы имели в виду:");
+      appendButtons(
+        results.map(function (result) {
+          var question = result.item;
+          return {
+            label: question.question,
+            onClick: function () {
+              showAnswer(question, getCategoryById(question.categoryId));
+            },
+          };
+        })
+      );
+    }
+
+    function handleSearchSubmit() {
+      var text = inputEl.value.trim();
+      if (!text || !qaData) {
+        return;
+      }
+      inputEl.value = "";
+      appendUserMessage(text);
+      showSearchResults(text);
     }
 
     function startDialogIfNeeded() {
@@ -228,6 +302,13 @@
     button.addEventListener("click", toggle);
     closeBtn.addEventListener("click", function () {
       setOpen(false);
+    });
+    sendBtn.addEventListener("click", handleSearchSubmit);
+    inputEl.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        handleSearchSubmit();
+      }
     });
 
     return {

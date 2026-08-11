@@ -10,10 +10,10 @@ Status: active
 Related requirements: —
 Related user flows: FLOW-001
 Related API: —
-Related data model: `window.ChatWidgetQA` (`widget/data/qa-data.js`, team/DECISIONS.md D-008)
+Related data model: `window.ChatWidgetQA` (`widget/data/qa-data.js`, team/DECISIONS.md D-008, D-009)
 Related security: —
-Related tests: team/reports/TASK-007-report.md
-Update trigger: изменение сценария (шаги приветствие → категории → вопросы → ответ) или формата данных qa-data.js
+Related tests: team/reports/TASK-007-report.md, team/reports/TASK-008-report.md
+Update trigger: изменение сценария (шаги приветствие → категории → вопросы → ответ, текстовый поиск) или формата данных qa-data.js
 
 ## Purpose
 
@@ -25,35 +25,38 @@ Update trigger: изменение сценария (шаги приветств
 
 Если `window.ChatWidgetQA` не подключён или имеет некорректный формат (нет массивов `categories`/`questions`) — виджет молча деградирует до прежней статичной заглушки-плейсхолдера, без ошибок в консоли.
 
+Поверх кнопочной навигации (D-008) поле ввода в футере активировано и работает как альтернативный путь к тем же данным (team/DECISIONS.md D-009): посетитель может напечатать вопрос текстом вместо клика по кнопкам. По отправке (Enter или кнопка) выполняется нечёткий поиск (fuzzy-search) библиотекой Fuse.js по `questions[].question` и опциональному `questions[].keywords` — результат не подставляется автоматически, а показывается 2–4 кнопками-кандидатами («Возможно, вы имели в виду:»); клик по кандидату работает как обычный клик по вопросу. Если релевантных совпадений нет — сообщение «Точный вопрос не найден» и кнопка возврата к категориям.
+
 ## User Flow
 
 См. FLOW-001 в `docs/project/user-flow.md`.
 
 ## Related Systems
 
-- `widget/src/widget.js` — логика движка (рендер сообщений, кнопок, переходы между экранами).
-- `widget/src/widget.css` — стили реплик пользователя/бота, кнопок-чипов, адаптация под мобильную ширину.
-- `widget/data/qa-data.js` — данные диалога (сейчас тестовая заглушка на 5 пар, реальный контент — TASK-006).
-- `demo.html` — подключает `qa-data.js` перед `loader.js` для локальной проверки.
+- `widget/src/widget.js` — логика движка (рендер сообщений, кнопок, переходы между экранами, текстовый поиск).
+- `widget/src/widget.css` — стили реплик пользователя/бота, кнопок-чипов, поля ввода, адаптация под мобильную ширину.
+- `widget/data/qa-data.js` — данные диалога (реальный контент — TASK-006; часть вопросов дополнена необязательным полем `keywords` для поиска — TASK-008).
+- `widget/vendor/fuse.min.js` — вендоренная локально библиотека нечёткого поиска Fuse.js (без CDN, D-009).
+- `demo.html` — подключает `qa-data.js` и `vendor/fuse.min.js` перед `loader.js` для локальной проверки.
 
 ## Implementation Links
 
-- `widget/src/widget.js` — функции `getQaData`, `startDialogIfNeeded`, `showCategories`, `showQuestions`, `showAnswer`, `appendButtons`, `appendMessage`.
-- `widget/src/widget.css` — классы `.cw-messages-chat`, `.cw-msg`, `.cw-msg-bot`, `.cw-msg-user`, `.cw-msg-note`, `.cw-buttons`, `.cw-chip-btn`.
-- team/DECISIONS.md — D-008 (формат данных и сценарий).
+- `widget/src/widget.js` — функции `getQaData`, `startDialogIfNeeded`, `showCategories`, `showQuestions`, `showAnswer`, `appendButtons`, `appendMessage`, `getFuse`, `showSearchResults`, `handleSearchSubmit`.
+- `widget/src/widget.css` — классы `.cw-messages-chat`, `.cw-msg`, `.cw-msg-bot`, `.cw-msg-user`, `.cw-msg-note`, `.cw-buttons`, `.cw-chip-btn`, `.cw-input`, `.cw-send-btn`.
+- team/DECISIONS.md — D-008 (формат данных и кнопочный сценарий), D-009 (текстовый поиск через Fuse.js).
 
 ## Security Impact
 
-Данные из `window.ChatWidgetQA` выводятся через `textContent` (не `innerHTML`) — исключён риск инъекции разметки через содержимое вопросов/ответов. Данные локальные (обычный JS-файл на странице клиента), запросов к серверу нет.
+Данные из `window.ChatWidgetQA` выводятся через `textContent` (не `innerHTML`) — исключён риск инъекции разметки через содержимое вопросов/ответов, включая текст, введённый посетителем в поле поиска. Fuse.js и данные полностью локальные (файлы на странице клиента), запросов к серверу нет.
 
 ## Acceptance Criteria
 
-См. критерии приёмки в `team/tasks/TASK-007.md`.
+См. критерии приёмки в `team/tasks/TASK-007.md` (кнопочный сценарий) и `team/tasks/TASK-008.md` (текстовый поиск).
 
 ## Test Notes
 
-Ручная проверка через `python3 -m http.server` + `demo.html`: happy path (приветствие → категория → вопрос → ответ → возврат), деградация без `window.ChatWidgetQA`, изоляция от «кривых» стилей хоста, мобильная ширина ~375px. Подробности и результаты — `team/reports/TASK-007-report.md`.
+Ручная проверка через `python3 -m http.server` + `demo.html` и через открытие `demo.html` напрямую как `file://`: happy path (приветствие → категория → вопрос → ответ → возврат), текстовый поиск (релевантный запрос с опечаткой/синонимом → кандидаты, нерелевантный запрос → «не найдено»), деградация без `window.ChatWidgetQA`, изоляция от «кривых» стилей хоста, мобильная ширина ~375px. Подробности и результаты — `team/reports/TASK-007-report.md`, `team/reports/TASK-008-report.md`.
 
 ## Release Notes
 
-Прототип без ИИ и без бэкенда — вопросы и ответы статичные, свободный текстовый ввод не поддерживается (поле ввода остаётся disabled).
+Прототип без ИИ и без бэкенда — вопросы и ответы статичные. Поверх кнопочной навигации доступен текстовый ввод с нечётким поиском (без ИИ/NLP) по готовой базе вопросов; результат поиска — всегда список кандидатов, а не автоматический ответ.

@@ -4,7 +4,7 @@
 
 | Задача | Название | Роль | Статус | Ветка |
 |---|---|---|---|---|
-| TASK-008 | Текстовый поиск по базе вопросов (fuzzy-search) | frontend | TODO | task/TASK-008 |
+| TASK-008 | Текстовый поиск по базе вопросов (fuzzy-search) | frontend | REVIEW | task/TASK-008 |
 
 <!-- Пример:
 | TASK-001 | Каркас API и БД | backend | TODO | task/TASK-001 |
