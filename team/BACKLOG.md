@@ -4,7 +4,7 @@
 
 | Задача | Название | Роль | Статус | Ветка |
 |---|---|---|---|---|
-| TASK-005 | Перенос темы pravoe-delo.su в продуктовый код виджета | frontend | TODO | task/TASK-005 |
+| TASK-005 | Перенос темы pravoe-delo.su в продуктовый код виджета | frontend | REVIEW | task/TASK-005 |
 
 <!-- Пример:
 | TASK-001 | Каркас API и БД | backend | TODO | task/TASK-001 |
