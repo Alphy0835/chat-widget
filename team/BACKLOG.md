@@ -4,7 +4,7 @@
 
 | Задача | Название | Роль | Статус | Ветка |
 |---|---|---|---|---|
-| TASK-004 | Дизайн виджета под фирменный стиль pravoe-delo.su | designer | REVIEW | task/TASK-004 |
+| TASK-005 | Перенос темы pravoe-delo.su в продуктовый код виджета | frontend | TODO | task/TASK-005 |
 
 <!-- Пример:
 | TASK-001 | Каркас API и БД | backend | TODO | task/TASK-001 |
@@ -19,3 +19,4 @@
 | TASK-001 | Перенос и адаптация docs-шаблона | docs | DONE | 2026-07-06 |
 | TASK-002 | Полная миграция остатка docs-шаблона в docs-archive/ | docs | DONE | 2026-07-06 |
 | TASK-003 | Отрисовка встраиваемого чат-виджета (UI-оболочка) | frontend | DONE | 2026-08-11 |
+| TASK-004 | Дизайн виджета под фирменный стиль pravoe-delo.su | designer | DONE | 2026-08-11 |
