@@ -1,0 +1,259 @@
+/*
+  Стили встраиваемого чат-виджета.
+  Подключаются внутри Shadow DOM (см. widget.js) — наружу не просачиваются,
+  стили сайта-хоста сюда не проникают (граница Shadow DOM).
+*/
+
+:host {
+  all: initial;
+}
+
+.cw-root,
+.cw-root * {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.cw-root {
+  --cw-primary: #2563eb;
+  --cw-radius: 16px;
+  --cw-offset: 24px;
+}
+
+/* Плавающая кнопка */
+
+.cw-button {
+  position: fixed;
+  bottom: var(--cw-offset);
+  z-index: 2147483000;
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: 50%;
+  background: var(--cw-primary);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.24);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  padding: 0;
+}
+
+.cw-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.cw-button svg {
+  width: 28px;
+  height: 28px;
+}
+
+.cw-icon-close {
+  display: none;
+}
+
+.cw-root.cw-open .cw-icon-chat {
+  display: none;
+}
+
+.cw-root.cw-open .cw-icon-close {
+  display: block;
+}
+
+.cw-root[data-position="bottom-right"] .cw-button {
+  right: var(--cw-offset);
+}
+
+.cw-root[data-position="bottom-left"] .cw-button {
+  left: var(--cw-offset);
+}
+
+/* Панель чата */
+
+.cw-panel {
+  position: fixed;
+  z-index: 2147483000;
+  bottom: calc(var(--cw-offset) * 2 + 60px);
+  width: 360px;
+  height: 520px;
+  max-height: calc(100vh - var(--cw-offset) * 3 - 60px);
+  background: #fff;
+  border-radius: var(--cw-radius);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(16px) scale(0.98);
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+}
+
+.cw-root.cw-open .cw-panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  visibility: visible;
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0s;
+}
+
+.cw-root[data-position="bottom-right"] .cw-panel {
+  right: var(--cw-offset);
+}
+
+.cw-root[data-position="bottom-left"] .cw-panel {
+  left: var(--cw-offset);
+}
+
+.cw-header {
+  background: var(--cw-primary);
+  color: #fff;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.cw-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cw-header-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.cw-close-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+  padding: 0;
+}
+
+.cw-close-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.cw-close-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cw-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.cw-placeholder {
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.cw-input-row {
+  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.cw-input {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 10px 14px;
+  font-size: 14px;
+  outline: none;
+  background: #f9fafb;
+  color: #9ca3af;
+}
+
+.cw-send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--cw-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.cw-send-btn:disabled,
+.cw-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cw-send-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Мобильная адаптивность: окно почти на весь экран */
+
+@media (max-width: 480px) {
+  .cw-panel {
+    width: calc(100vw - 16px);
+    height: calc(100vh - 16px);
+    max-height: calc(100vh - 16px);
+    bottom: 8px;
+    border-radius: 12px;
+  }
+
+  .cw-root[data-position="bottom-right"] .cw-panel {
+    right: 8px;
+  }
+
+  .cw-root[data-position="bottom-left"] .cw-panel {
+    left: 8px;
+  }
+
+  .cw-button {
+    width: 56px;
+    height: 56px;
+    bottom: 16px;
+  }
+
+  .cw-root[data-position="bottom-right"] .cw-button {
+    right: 16px;
+  }
+
+  .cw-root[data-position="bottom-left"] .cw-button {
+    left: 16px;
+  }
+}
