@@ -32,6 +32,17 @@
     return div.innerHTML;
   }
 
+  function getQaData() {
+    var data = window.ChatWidgetQA;
+    if (!data || typeof data !== "object") {
+      return null;
+    }
+    if (!Array.isArray(data.categories) || !Array.isArray(data.questions)) {
+      return null;
+    }
+    return data;
+  }
+
   function mount(shadowRoot, config) {
     var position = config.position === "bottom-left" ? "bottom-left" : "bottom-right";
 
@@ -76,12 +87,138 @@
     var button = root.querySelector(".cw-button");
     var panel = root.querySelector(".cw-panel");
     var closeBtn = root.querySelector(".cw-close-btn");
+    var messagesEl = root.querySelector(".cw-messages");
+
+    var qaData = getQaData();
+    var dialogStarted = false;
 
     function setOpen(isOpen) {
       root.classList.toggle("cw-open", isOpen);
       button.setAttribute("aria-expanded", String(isOpen));
       panel.setAttribute("aria-hidden", String(!isOpen));
       button.setAttribute("aria-label", isOpen ? "Закрыть чат" : "Открыть чат");
+      if (isOpen) {
+        startDialogIfNeeded();
+      }
+    }
+
+    function scrollMessagesToBottom() {
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function appendMessage(text, role, extraClass) {
+      var msg = document.createElement("div");
+      msg.className = "cw-msg cw-msg-" + role + (extraClass ? " " + extraClass : "");
+      msg.textContent = text;
+      messagesEl.appendChild(msg);
+      scrollMessagesToBottom();
+      return msg;
+    }
+
+    function appendBotMessage(text, isNote) {
+      return appendMessage(text, "bot", isNote ? "cw-msg-note" : "");
+    }
+
+    function appendUserMessage(text) {
+      return appendMessage(text, "user");
+    }
+
+    function disableButtonGroup(groupEl) {
+      var buttons = groupEl.querySelectorAll("button");
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].disabled = true;
+      }
+      groupEl.classList.add("cw-buttons-done");
+    }
+
+    function appendButtons(items) {
+      var group = document.createElement("div");
+      group.className = "cw-buttons";
+      items.forEach(function (item) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "cw-chip-btn";
+        btn.textContent = item.label;
+        btn.addEventListener("click", function () {
+          disableButtonGroup(group);
+          item.onClick();
+        });
+        group.appendChild(btn);
+      });
+      messagesEl.appendChild(group);
+      scrollMessagesToBottom();
+      return group;
+    }
+
+    function showCategories() {
+      appendBotMessage("Выберите категорию:");
+      appendButtons(
+        qaData.categories.map(function (category) {
+          return {
+            label: category.title,
+            onClick: function () {
+              showQuestions(category);
+            },
+          };
+        })
+      );
+    }
+
+    function showQuestions(category) {
+      var categoryQuestions = qaData.questions.filter(function (q) {
+        return q.categoryId === category.id;
+      });
+      appendBotMessage("Вопросы категории «" + category.title + "»:");
+      var items = categoryQuestions.map(function (q) {
+        return {
+          label: q.question,
+          onClick: function () {
+            showAnswer(q, category);
+          },
+        };
+      });
+      items.push({
+        label: "‹ Все категории",
+        onClick: function () {
+          showCategories();
+        },
+      });
+      appendButtons(items);
+    }
+
+    function showAnswer(question, category) {
+      appendUserMessage(question.question);
+      appendBotMessage(question.answer);
+      appendButtons([
+        {
+          label: "Другие вопросы этой категории",
+          onClick: function () {
+            showQuestions(category);
+          },
+        },
+        {
+          label: "Все категории",
+          onClick: function () {
+            showCategories();
+          },
+        },
+      ]);
+    }
+
+    function startDialogIfNeeded() {
+      if (dialogStarted || !qaData) {
+        return;
+      }
+      dialogStarted = true;
+      messagesEl.innerHTML = "";
+      messagesEl.classList.add("cw-messages-chat");
+      appendBotMessage(
+        "Здравствуйте! Я бот-помощник. Выберите интересующую категорию вопросов, и я подскажу ответ."
+      );
+      if (qaData.disclaimer) {
+        appendBotMessage(qaData.disclaimer, true);
+      }
+      showCategories();
     }
 
     function toggle() {
